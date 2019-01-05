@@ -395,17 +395,12 @@ function draw_steps(context) {
                         break;
                     case bobX:
                         window.clearInterval(interval);
+                        break;
                     default:
                         x+= animIter;
                         draw_line(context, x-animIter, defaultY, x, defaultY);
                         break;
                 }
-                
-                
-                if(x == bobX) {
-                    window.clearInterval(interval);
-                }
-                
             }, 15);
             break;
         case 9:
@@ -469,17 +464,16 @@ function draw_steps(context) {
                             flag = false;
                         }
                         break;
+                    case bobX2:
+                        context.fillStyle = "black";
+                        context.fillText("Bob can verify that the message was sent by Alice because only Alice can use her private key.", 20, explanationY+70);
+                        window.clearInterval(interval);
+                        break;
                     default:
                         x+= animIter;
                         draw_line(context, x-animIter, defaultY, x, defaultY);
                         break;
                 }
-                if(x == bobX2) {
-                    context.fillStyle = "black";
-                    context.fillText("Bob can verify that the message was sent by Alice because only Alice can use her private key.", 20, explanationY+70);
-                    window.clearInterval(interval);
-                }
-                
             }, 15);
             break;
         default:
