@@ -31,7 +31,7 @@ function draw_circle(context, centerX, centerY, rad, colour) {
 }
 
 function draw_base(context, line) {
-//draws the base image of alice/bob and the message line between them
+//draws the base image of alice/bob and the message line between them (dependent on if line is true/false)
     var textY = 40;
     draw_circle(context, aliceX, defaultY, radius, 'black');
     draw_circle(context, bobX, defaultY, radius, 'black');
@@ -65,6 +65,21 @@ function draw_animated_encryption(context, i) {
     i += animIter;
     draw_line(context, i-animIter, defaultY, i, defaultY);
     return i;
+}
+
+function vertical_circle(context, startY, colour, flag,  x, y, str1, str2) {
+//draws circle and vertical line coming off of it, used in last animations
+    if (!flag) {
+        y = startY;
+        draw_circle(context, x, startY, radius * 0.65, colour);
+        flag = true; 
+        context.fillText(str1, x-30, startY+10+radius);
+        context.fillText(str2, x-30, startY+27+radius); 
+    }
+    y-= 2;
+    draw_line(context, x, startY, x, y);
+    
+    return [flag, y];
 }
 
 function draw_steps(context) {
@@ -122,7 +137,7 @@ function draw_steps(context) {
 					context.fillText("But this requires both parties to have the same key.", 20, c3Y+lineSize);
 					context.fillText("How do they share a key without already knowing it?", 20, c3Y+(lineSize*2));
 				}
-			}, 10);
+			}, 15);
 			
 			break;
 
@@ -184,10 +199,7 @@ function draw_steps(context) {
                     }
                     context.stroke();
                 }
-            }, 10);
-            //One way is a private channel for key sharing that only Alice and Bob know about
-            //private channel -> message -> key -> ciphertext
-			//But for anonymous interactions on the scale of the internet, this solution is unfeasible
+            }, 15);
 			break;
         case 5:
             //Draws example of asymmetric key generation
@@ -246,9 +258,6 @@ function draw_steps(context) {
                 }
             }, 15);
 
-
-            //Generates two numbers, p and q
-            //animation showing those numbers and then the maths used to generate keys
             break;
         case 6:
             context.fillText("Alice now has two keys, a public key and a private key", 20, 20);
@@ -293,16 +302,12 @@ function draw_steps(context) {
                     context.fillText("n", leftX+iterator+10, y+15);
                     context.fillText("d",rightX+iterator, y+15);
                     
-                    context.fillText("The public key is of the format (e, n) and is for encryption", 20, 200);
-                    context.fillText("The private key is of the format (d, n) and is for decryption", 20, 220);
+                    context.fillText("The public key is of the format (e, n) and is for encryption. Alice's would be (69, 4437).", 20, 200);
+                    context.fillText("The private key is of the format (d, n) and is for decryption. Alice's would be (779, 4437).", 20, 220);
                     context.fillText("Alice can now publish her public key so that anybody can easily send her encrypted messages.", 20, 240);
                     context.fillText("Next, we'll see how asymmetric encryption is used in practice.", 20, 280);
                 }
             }, 15);
-            //For Asymmetric Encryption to work, both sides have to first generate two keys
-            //draw key generation example
-			//Do smaller animations bit-by-bit to explain
-			//Each person has two keys, a public key for encryption and a private key for decryption. 
             
             break;
         case 7:
@@ -312,53 +317,166 @@ function draw_steps(context) {
             var x = aliceX;
             var leftBound = aliceX + 70;
             var rightBound = bobX - 70;
-            var leftCircle = rightCircle = false;
+            var flag = false;
             interval = window.setInterval(function() {
-                if(x < leftBound) {
-                    x += animIter;
-                    draw_line(context, x-animIter, defaultY, x, defaultY); 
-                } else if ( x == leftBound) {
-                    if (!leftCircle) {
-                        y = startY;
-                        draw_circle(context, x, startY, radius * 0.65, "green");
-                        leftCircle = true; 
-                        context.fillText("Encrypt with", x-50, startY+10+radius);
-                        context.fillText("Bob's Public Key", x-50, startY+27+radius); 
-                    }
-                    y-= 2;
-                    draw_line(context, x, startY, x, y);
-                } 
-                if(y == defaultY && x < rightBound) {
-                    context.strokeStyle = 'blue';
-                    x+= animIter;
-                    draw_line(context, x-animIter, defaultY, x, defaultY);
-                }
-                if (x == rightBound) {
-                    if (!rightCircle) {
-                        context.fillStyle = 'blue';
-                        context.fillText("Encrypted Message", 140, 40);
-                        y = startY;
-                        draw_circle(context, x, startY, radius*0.65, "purple");
-                        rightCircle = true;  
-                        context.fillText("Decrypt with", x-50, startY+10+radius);
-                        context.fillText("Bob's Private Key", x-50, startY+27+radius);
-                    }
-                    y -= 2;
-                    draw_line(context, x, startY, x, y);
+                switch(x) {
+                    case leftBound:
+                        [flag, y] = vertical_circle(context, startY, "green", flag, x, y,
+                                                    "Encrypt with", "Bob's Public Key");
+                        if(y == defaultY) {
+                            context.strokeStyle = "blue";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    case rightBound:
+                        [flag, y] = vertical_circle(context, startY, "purple", flag, x, y,
+                                                    "Decrypt with", "Bob's Public Key");
+                        if(y == defaultY) {
+                            context.strokeStyle = "black";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    case bobX:
+                        context.fillStyle = 'black';
+                        context.fillText("Alice uses Bob's public key to encrypt her message,", 20, explanationY+(lineSize*2));
+                        context.fillText("and Bob uses his private key to decrypt.", 20, explanationY+(lineSize*3));
+                        context.fillText("Asymmetric algorithms are typically used to set up an encrypted channel,", 20, explanationY+(lineSize*4));
+                        context.fillText("because Alice doesn't need to know anything other than Bob's public key.", 20, explanationY+(lineSize*5));
+                        window.clearInterval(interval);
+                        break;
+                    default:
+                        x+= animIter;
+                        draw_line(context, x-animIter, defaultY, x, defaultY);
+                        break;
                 }
                 
-                if(y == defaultY && x >= rightBound) {
-                    context.strokeStyle = 'black';
-                    x+= animIter;
-                    draw_line(context, x-animIter, defaultY, x, defaultY);
+            }, 15);
+            break;
+        case 8:
+            context.fillText("However, Bob still can't confirm that the sender is actually Alice.", 20, explanationY);
+            var textY = 40;
+            draw_circle(context, aliceX, defaultY, radius, 'red');
+            context.fillText("Trudy", aliceX - 25, textY);
+            draw_circle(context, bobX, defaultY, radius, 'black');
+            
+            context.fillText("Bob", bobX - 20, textY);
+
+            var startY = defaultY + 70;
+            var x = aliceX;
+            var leftBound = aliceX + 70;
+            var rightBound = bobX - 70;
+            var flag = false;
+            context.strokeStyle = "red";
+            interval = window.setInterval(function() {
+                switch(x) {
+                    case leftBound:
+                        [flag, y] = vertical_circle(context, startY, "green", flag, x, y,
+                                                    "Encrypt with", "Bob's Public Key");
+                        if(y == defaultY) {
+                            context.strokeStyle = "blue";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    case rightBound:
+                        [flag, y] = vertical_circle(context, startY, "purple", flag, x, y,
+                                                    "Decrypt with", "Bob's Public Key");
+                        if(y == defaultY) {
+                            context.strokeStyle = "black";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    case bobX:
+                        window.clearInterval(interval);
+                    default:
+                        x+= animIter;
+                        draw_line(context, x-animIter, defaultY, x, defaultY);
+                        break;
                 }
+                
                 
                 if(x == bobX) {
-                    context.fillStyle = 'black';
-                    context.fillText("Alice uses Bob's public key to encrypt her message,", 20, explanationY+(lineSize*2));
-                    context.fillText("and Bob uses his private key to decrypt.", 20, explanationY+(lineSize*3));
-                    context.fillText("Asymmetric algorithms are typically used to set up an encrypted channel,", 20, explanationY+(lineSize*4));
-                    context.fillText("because Alice doesn't need to know anything other than Bob's public key.", 20, explanationY+(lineSize*5));
+                    window.clearInterval(interval);
+                }
+                
+            }, 15);
+            break;
+        case 9:
+            context.fillText("For further authentication, Alice can first 'encrypt' the message (or 'digest' of the message) with her private key.", 20, explanationY+20);
+            context.fillText("Bob can then verify that the message was sent by Alice by 'decrypting' with her public key.", 20, explanationY+lineSize+20);
+            var textY = 40;
+            var bobX2 = bobX + 100;
+            draw_circle(context, aliceX, defaultY, radius, 'black');
+            draw_circle(context, bobX2, defaultY, radius, 'black');
+            
+            context.fillText("Alice", aliceX - 25, textY);
+            context.fillText("Bob", bobX2 - 20, textY);            
+            
+            var x = aliceX;
+            var startY = defaultY + 70;
+            var leftBoundA = aliceX + 70;
+            var leftBoundB = aliceX + 130;
+            var rightBoundA = bobX2 - 70;
+            var rightBoundB = bobX2 - 130;
+            var flag = false;
+            
+            interval = window.setInterval(function() {
+                switch (x) {
+                    case leftBoundA:
+                        [flag, y] = vertical_circle(context, startY + 40, "purple", flag, x, y,
+                                                    "E. with", "Alice Priv.");
+                        if(y == defaultY) {
+                            context.strokeStyle = "black";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    case leftBoundB:
+                        [flag, y] = vertical_circle(context, startY, "green", flag, x, y,
+                                                    "E. with", "Bob Pub.");
+                        if(y == defaultY) {
+                            context.strokeStyle = "blue";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    case rightBoundA:
+                        [flag, y] = vertical_circle(context, startY + 40, "green", flag, x, y,
+                                                    "D. with","Alice Pub.");
+                        if(y == defaultY) {
+                            context.strokeStyle = "black";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    case rightBoundB:
+                        [flag, y] = vertical_circle(context, startY, "purple", flag, x, y,
+                                                    "D. with","Bob Priv.");
+                        if(y == defaultY) {
+                            context.strokeStyle = "black";
+                            x += animIter;
+                            draw_line(context, x-animIter, defaultY, x, defaultY);
+                            flag = false;
+                        }
+                        break;
+                    default:
+                        x+= animIter;
+                        draw_line(context, x-animIter, defaultY, x, defaultY);
+                        break;
+                }
+                if(x == bobX2) {
+                    context.fillStyle = "black";
+                    context.fillText("Bob can verify that the message was sent by Alice because only Alice can use her private key.", 20, explanationY+70);
                     window.clearInterval(interval);
                 }
                 
