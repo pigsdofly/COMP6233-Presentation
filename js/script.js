@@ -517,4 +517,24 @@ $("#back").click(function() {
     button_click(-1);
 });
 
+$(document).keydown(function(e) {
+    switch (e.which) {
+        case 39: // right arrow
+            button_click(1)
+            break;
+        case 13: // enter
+            button_click(1)
+            break;
+        case 32: //spacebar
+            button_click(1)
+            break;
+        case 37: // left arrow
+            button_click(-1)
+            break;
+        case 9: // backspace
+            button_click(-1)
+            break;
+    }
+})
+
 draw();
