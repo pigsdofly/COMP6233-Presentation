@@ -3,12 +3,31 @@ var radius = 20;
 //interval variable for animations
 var interval;
 var animIter = 2;
-var explanationY = 240;
+// var explanationY = 240;
 var lineSize = 17; //16px text size + 1
-var aliceX = 70;
-var bobX = 370;
+// var alice.X = 70;
+// var bob.X = 370;
 var defaultY = 70;
 
+var alice = {
+    X: 70,
+    Y: 70
+}
+
+var bob = {
+    X: 370,
+    Y: 70
+}
+
+var canvasSize = {
+    width: 500,
+    height: 500
+}
+
+var explanation = {
+    X: 20,
+    Y: 240
+}
 
 function draw_line(context, startX, startY, endX, endY) {
 //function for drawing a line during an interval
@@ -33,22 +52,22 @@ function draw_circle(context, centerX, centerY, rad, colour) {
 function draw_base(context, line) {
 //draws the base image of alice/bob and the message line between them (dependent on if line is true/false)
     var textY = 40;
-    draw_circle(context, aliceX, defaultY, radius, 'black');
-    draw_circle(context, bobX, defaultY, radius, 'black');
+    draw_circle(context, alice.X, alice.Y, radius, 'black');
+    draw_circle(context, bob.X, bob.Y, radius, 'black');
     
-    context.fillText("Alice", aliceX - 25, textY);
-    context.fillText("Bob", bobX - 20, textY);
+    context.fillText("Alice", alice.X - 25, textY);
+    context.fillText("Bob", bob.X - 20, textY);
     
 	if(line) {
-        draw_line(context, aliceX, defaultY, bobX, defaultY);
+        draw_line(context, alice.X, alice.Y, bob.X, bob.Y);
 	}
 }
 
 
 function draw_animated_encryption(context, i) {
 //animation for drawing line going through keys to encrypt and decrypt
-    var leftBound = aliceX + 70;
-    var rightBound = bobX - 70;
+    var leftBound = alice.X + 70;
+    var rightBound = bob.X - 70;
     if(i == leftBound || i == rightBound) {
         draw_circle(context, i, defaultY, radius * 0.8, 'blue');
         if(i == leftBound)
@@ -88,19 +107,19 @@ function draw_steps(context) {
         case 1:
             //first screen
             draw_base(context, true);
-    		context.fillText("Message", aliceX + 100, 40);
+    		context.fillText("Message", alice.X + 100, 40);
             
-            context.fillText("Alice and Bob want to send a message to each other.", 20, explanationY);
+            context.fillText("Alice and Bob want to send a message to each other.", explanation.X, explanation.Y);
             
             break;
         case 2:
             draw_base(context, true);
-    		context.fillText("Message", aliceX + 100, 40);
+    		context.fillText("Message", alice.X + 100, 40);
 
-            var trudyX = (aliceX + bobX) / 2;
+            var trudyX = (alice.X + bob.X) / 2;
             context.beginPath();
             context.strokeStyle = 'red';
-            var i = aliceX;
+            var i = alice.X;
             var trudyY = defaultY + 100;
             interval = window.setInterval(function() {
                 if(i != (trudyY)) {
@@ -112,8 +131,8 @@ function draw_steps(context) {
                     context.fillText("Trudy", trudyX-radius, 210);
                     
                     context.fillStyle = 'black';
-                    context.fillText("But when their connection is unencrypted,", 20, explanationY);
-                    context.fillText("Trudy can listen in.", 20, explanationY+lineSize);
+                    context.fillText("But when their connection is unencrypted,", explanation.X, explanation.Y);
+                    context.fillText("Trudy can listen in.", explanation.X, explanation.Y+lineSize);
                     
                 }
             }, 15);
@@ -121,14 +140,14 @@ function draw_steps(context) {
         case 3:
 			draw_base(context, false);
 			var i = 56;
-            c3Y = explanationY;
+            c3Y = explanation.Y;
             context.fillText("To stop their messages being tampered with, Alice and Bob can use symmetric encryption.", 20, c3Y);
             context.fillText("In symmetric encryption, both parties use the same key to encrypt and decrypt the message.", 20, c3Y+lineSize);
             c3Y += (lineSize*2);
             
 			interval = window.setInterval(function() {
                 i = draw_animated_encryption(context, i);
-				if( i >= bobX) {
+				if( i >= bob.X) {
 					window.clearInterval(interval);
                     context.fillStyle = 'blue';
                     context.fillText("Encrypted Message", 140, 40);
@@ -146,35 +165,35 @@ function draw_steps(context) {
             //but if both parties don't have a key, how do they share?
         case 4:
             draw_base(context, false);
-            context.fillText("One way past what is known as the Key Distribution Problem is to", 20, explanationY);
-            context.fillText("share the key through a known secure channel beforehand (such as a physical courier).", 20, explanationY+lineSize);
-            var x = i = aliceX;
+            context.fillText("One way past what is known as the Key Distribution Problem is to", explanation.X, explanation.Y);
+            context.fillText("share the key through a known secure channel beforehand (such as a physical courier).", explanation.X, explanation.Y+lineSize);
+            var x = i = alice.X;
             var y = defaultY;
             var secure_channel = false;
-            context.moveTo(aliceX,defaultY);
+            context.moveTo(alice.X,defaultY);
             interval = window.setInterval(function() {
 				if(secure_channel) {
                     context.lineWidth = 5;
                     i = draw_animated_encryption(context, i);
-                    if(i >= bobX) {
+                    if(i >= bob.X) {
                         window.clearInterval(interval);
                         context.fillStyle = "black";
-                        context.fillText("But this solution isn't practical for most interactions, especially on the scale of the internet.", 20, explanationY+(lineSize*3));
-                        context.fillText("And so we must use other methods, like Asymmetric Encryption.", 20, explanationY+(lineSize*4));
+                        context.fillText("But this solution isn't practical for most interactions, especially on the scale of the internet.", explanation.X, explanation.Y+(lineSize*3));
+                        context.fillText("And so we must use other methods, like Asymmetric Encryption.", explanation.X, explanation.Y+(lineSize*4));
                     }
                 } else {
                     //animated drawing of dotted line
-                    if(x == bobX) {
+                    if(x == bob.X) {
                         if(y == defaultY) {
                             secure_channel = true;
                             context.fillText("Key shared over secure channel", 100, 190);
                             //drawing an arrow back to (70,70)
                             context.lineWidth = 2;
-                            context.moveTo(bobX, 160);
-                            context.lineTo(aliceX, 160);
+                            context.moveTo(bob.X, 160);
+                            context.lineTo(alice.X, 160);
                             context.stroke();
                             context.beginPath();
-                            context.moveTo(aliceX, 160);
+                            context.moveTo(alice.X, 160);
                             context.lineTo(80, 170);
                             context.lineTo(80, 150);
                             context.fill();
@@ -185,10 +204,10 @@ function draw_steps(context) {
                     }
                     else if(y < 140) {
                         y += animIter;
-                        context.lineTo(aliceX, y);
+                        context.lineTo(alice.X, y);
                     } else {
-                        var gap = ((x - aliceX) % 20) == 0; //evaluates as a true or false for if we draw a gap
-                        if(!gap || x == aliceX) {
+                        var gap = ((x - alice.X) % 20) == 0; //evaluates as a true or false for if we draw a gap
+                        if(!gap || x == alice.X) {
                             x += animIter;
                             context.lineTo(x, 140);
                             context.stroke();
@@ -207,7 +226,7 @@ function draw_steps(context) {
             context.fillText("In Asymmetric Encryption, everyone has two personal keys.",20,messageY);
             context.fillText("In the RSA algorithm, these keys are created from three variables: e, p and q. ",20,messageY+lineSize);
             
-            var midX = (aliceX+bobX)/2;
+            var midX = (alice.X+bob.X)/2;
 
             draw_circle(context, midX, defaultY, radius, "black");
             context.fillText("Alice", midX+40, defaultY+5);
@@ -261,7 +280,7 @@ function draw_steps(context) {
             break;
         case 6:
             context.fillText("Alice now has two keys, a public key and a private key", 20, 20);
-            var midX = (aliceX+bobX)/2;
+            var midX = (alice.X+bob.X)/2;
             var iterator = 2;
             var y = startY = defaultY;
             context.fillText("Alice", midX + (radius * 2), defaultY);
@@ -311,12 +330,12 @@ function draw_steps(context) {
             
             break;
         case 7:
-            context.fillText("Bob has also generated a public/private key pair.", 20, explanationY);
+            context.fillText("Bob has also generated a public/private key pair.", explanation.X, explanation.Y);
             draw_base(context,false);
             var startY = defaultY + 70;
-            var x = aliceX;
-            var leftBound = aliceX + 70;
-            var rightBound = bobX - 70;
+            var x = alice.X;
+            var leftBound = alice.X + 70;
+            var rightBound = bob.X - 70;
             var flag = false;
             interval = window.setInterval(function() {
                 switch(x) {
@@ -340,12 +359,12 @@ function draw_steps(context) {
                             flag = false;
                         }
                         break;
-                    case bobX:
+                    case bob.X:
                         context.fillStyle = 'black';
-                        context.fillText("Alice uses Bob's public key to encrypt her message,", 20, explanationY+(lineSize*2));
-                        context.fillText("and Bob uses his private key to decrypt.", 20, explanationY+(lineSize*3));
-                        context.fillText("Asymmetric algorithms are typically used to set up an encrypted channel,", 20, explanationY+(lineSize*4));
-                        context.fillText("because Alice doesn't need to know anything other than Bob's public key.", 20, explanationY+(lineSize*5));
+                        context.fillText("Alice uses Bob's public key to encrypt her message,", explanation.X, explanation.Y+(lineSize*2));
+                        context.fillText("and Bob uses his private key to decrypt.", explanation.X, explanation.Y+(lineSize*3));
+                        context.fillText("Asymmetric algorithms are typically used to set up an encrypted channel,", explanation.X, explanation.Y+(lineSize*4));
+                        context.fillText("because Alice doesn't need to know anything other than Bob's public key.", explanation.X, explanation.Y+(lineSize*5));
                         window.clearInterval(interval);
                         break;
                     default:
@@ -357,18 +376,18 @@ function draw_steps(context) {
             }, 15);
             break;
         case 8:
-            context.fillText("However, Bob still can't confirm that the sender is actually Alice.", 20, explanationY);
+            context.fillText("However, Bob still can't confirm that the sender is actually Alice.", explanation.X, explanation.Y);
             var textY = 40;
-            draw_circle(context, aliceX, defaultY, radius, 'red');
-            context.fillText("Trudy", aliceX - 25, textY);
-            draw_circle(context, bobX, defaultY, radius, 'black');
+            draw_circle(context, alice.X, alice.Y, radius, 'red');
+            context.fillText("Trudy", alice.X - 25, textY);
+            draw_circle(context, bob.X, bob.Y, radius, 'black');
             
-            context.fillText("Bob", bobX - 20, textY);
+            context.fillText("Bob", bob.X - 20, textY);
 
             var startY = defaultY + 70;
-            var x = aliceX;
-            var leftBound = aliceX + 70;
-            var rightBound = bobX - 70;
+            var x = alice.X;
+            var leftBound = alice.X + 70;
+            var rightBound = bob.X - 70;
             var flag = false;
             context.strokeStyle = "red";
             interval = window.setInterval(function() {
@@ -393,7 +412,7 @@ function draw_steps(context) {
                             flag = false;
                         }
                         break;
-                    case bobX:
+                    case bob.X:
                         window.clearInterval(interval);
                         break;
                     default:
@@ -404,22 +423,22 @@ function draw_steps(context) {
             }, 15);
             break;
         case 9:
-            context.fillText("For further authentication, Alice can first 'encrypt' the message (or 'digest' of the message) with her private key.", 20, explanationY+20);
-            context.fillText("Bob can then verify that the message was sent by Alice by 'decrypting' with her public key.", 20, explanationY+lineSize+20);
+            context.fillText("For further authentication, Alice can first 'encrypt' the message (or 'digest' of the message) with her private key.", explanation.X, explanation.Y+20);
+            context.fillText("Bob can then verify that the message was sent by Alice by 'decrypting' with her public key.", explanation.X, explanation.Y+lineSize+20);
             var textY = 40;
-            var bobX2 = bobX + 100;
-            draw_circle(context, aliceX, defaultY, radius, 'black');
-            draw_circle(context, bobX2, defaultY, radius, 'black');
+            bob.X2 = bob.X + 100;
+            draw_circle(context, alice.X, alice.Y, radius, 'black');
+            draw_circle(context, bob.X2, bob.Y, radius, 'black');
             
-            context.fillText("Alice", aliceX - 25, textY);
-            context.fillText("Bob", bobX2 - 20, textY);            
+            context.fillText("Alice", alice.X - 25, textY);
+            context.fillText("Bob", bob.X2 - 20, textY);            
             
-            var x = aliceX;
+            var x = alice.X;
             var startY = defaultY + 70;
-            var leftBoundA = aliceX + 70;
-            var leftBoundB = aliceX + 130;
-            var rightBoundA = bobX2 - 70;
-            var rightBoundB = bobX2 - 130;
+            var leftBoundA = alice.X + 70;
+            var leftBoundB = alice.X + 130;
+            var rightBoundA = bob.X2 - 70;
+            var rightBoundB = bob.X2 - 130;
             var flag = false;
             
             interval = window.setInterval(function() {
@@ -464,9 +483,9 @@ function draw_steps(context) {
                             flag = false;
                         }
                         break;
-                    case bobX2:
+                    case bob.X2:
                         context.fillStyle = "black";
-                        context.fillText("Bob can verify that the message was sent by Alice because only Alice can use her private key.", 20, explanationY+70);
+                        context.fillText("Bob can verify that the message was sent by Alice because only Alice can use her private key.", explanation.X, explanation.Y+70);
                         window.clearInterval(interval);
                         break;
                     default:
@@ -517,4 +536,45 @@ $("#back").click(function() {
     button_click(-1);
 });
 
-draw();
+$(document).keydown(function(e) {
+    switch (e.which) {
+        case 39: // right arrow
+            button_click(1)
+            break;
+        case 13: // enter
+            button_click(1)
+            break;
+        case 32: //spacebar
+            button_click(1)
+            break;
+        case 37: // left arrow
+            button_click(-1)
+            break;
+        case 9: // backspace
+            button_click(-1)
+            break;
+    }
+})
+
+function resizeCanvas () {
+    var canvas = document.getElementById("canvas1");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    canvasSize.width = window.innerWidth
+    canvasSize.height = window.innerHeight
+}
+
+function resizeElements() {
+    explanation.Y = explanation.Y
+    alice.X = canvasSize.width * 0.25
+    bob.X = canvasSize.width * 0.75
+    defaultY = defaultY 
+}
+
+$(document).ready(function () {
+    // resizeCanvas()
+    // resizeElements()
+    draw();
+})
+
