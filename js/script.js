@@ -29,15 +29,6 @@ var explanation = {
     Y: 240
 }
 
-function resizeElements(canvasWidth, canvasHeight) {
-    scaleFactor = 1
-    explanationY = explanationY * scaleFactor
-    alice.X = alice.X * scaleFactor
-    bob.X = bob.X * scaleFactor
-    defaultY = defaultY * scaleFactor
-}
-
-
 function draw_line(context, startX, startY, endX, endY) {
 //function for drawing a line during an interval
     context.beginPath();
@@ -118,7 +109,7 @@ function draw_steps(context) {
             draw_base(context, true);
     		context.fillText("Message", alice.X + 100, 40);
             
-            context.fillText("Alice and Bob want to send a message to each other.", 20, explanationY);
+            context.fillText("Alice and Bob want to send a message to each other.", explanation.X, explanation.Y);
             
             break;
         case 2:
@@ -175,7 +166,7 @@ function draw_steps(context) {
         case 4:
             draw_base(context, false);
             context.fillText("One way past what is known as the Key Distribution Problem is to", explanation.X, explanation.Y);
-            context.fillText("share the key through a known secure channel beforehand (such as a physical courier).", 20, explanation.Y+lineSize);
+            context.fillText("share the key through a known secure channel beforehand (such as a physical courier).", explanation.X, explanation.Y+lineSize);
             var x = i = alice.X;
             var y = defaultY;
             var secure_channel = false;
@@ -565,14 +556,25 @@ $(document).keydown(function(e) {
     }
 })
 
-// $(document).ready(function () {
-//     var canvas = document.getElementById("canvas1");
-//     canvas.width = window.innerWidth;
-//     canvas.height = window.innerHeight;
+function resizeCanvas () {
+    var canvas = document.getElementById("canvas1");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     
-//     canvasSize.width = window.innerWidth
-//     canvasSize.height = window.innerHeight
-//     resizeElements()
-// })
+    canvasSize.width = window.innerWidth
+    canvasSize.height = window.innerHeight
+}
 
-draw();
+function resizeElements() {
+    explanation.Y = explanation.Y
+    alice.X = canvasSize.width * 0.25
+    bob.X = canvasSize.width * 0.75
+    defaultY = defaultY 
+}
+
+$(document).ready(function () {
+    // resizeCanvas()
+    // resizeElements()
+    draw();
+})
+
