@@ -1,1 +1,1 @@
-JS canvas animation made for a COMP6233 module presentation
+JS canvas animation made for a presentation about public key cryptography
